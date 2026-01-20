@@ -16,6 +16,10 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    avatarUrl: {
+        type: String,
+        default: null
+    },
     profession: {
         type: String,
         enum: ['IT Professional', 'Student', 'HR / Manager', 'Freelancer', 'General User', 'Not Specified'],
@@ -59,9 +63,20 @@ const UserSchema = new mongoose.Schema({
             default: 30
         }
     },
+    bio: {
+        type: String,
+        default: 'Passionate about AI and productivity.'
+    },
     createdAt: {
         type: Date,
         default: Date.now
+    }
+});
+
+// Pre-save hook for email normalization
+UserSchema.pre('save', function () {
+    if (this.email) {
+        this.email = this.email.toLowerCase();
     }
 });
 

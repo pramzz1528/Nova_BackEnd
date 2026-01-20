@@ -17,6 +17,7 @@ exports.getTasks = async (req, res) => {
 // @desc    Create a task
 // @access  Private
 exports.createTask = async (req, res) => {
+    console.log('[DEBUG] createTask Request:', { body: req.body, user: req.user.id });
     const { title, description, priority, dueDate } = req.body;
 
     if (!title) {

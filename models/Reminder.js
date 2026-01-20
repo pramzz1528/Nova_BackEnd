@@ -19,6 +19,10 @@ const ReminderSchema = new mongoose.Schema({
         enum: ['None', 'Daily', 'Weekly'],
         default: 'None'
     },
+    category: {
+        type: String,
+        default: 'General'
+    },
     isCompleted: {
         type: Boolean,
         default: false

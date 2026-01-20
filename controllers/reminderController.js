@@ -17,7 +17,8 @@ exports.getReminders = async (req, res) => {
 // @desc    Create a reminder
 // @access  Private
 exports.createReminder = async (req, res) => {
-    const { title, time, repeat } = req.body;
+    console.log('[DEBUG] createReminder Request:', { body: req.body, user: req.user.id });
+    const { title, time, repeat, category } = req.body;
 
     if (!title || !time) {
         return res.status(400).json({ msg: 'Title and time are required' });
@@ -28,7 +29,8 @@ exports.createReminder = async (req, res) => {
             user: req.user.id,
             title,
             time,
-            repeat
+            repeat,
+            category
         });
 
         const reminder = await newReminder.save();
