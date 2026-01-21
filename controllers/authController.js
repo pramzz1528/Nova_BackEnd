@@ -59,19 +59,22 @@ exports.login = async (req, res) => {
         return res.status(400).json({ msg: 'Please enter both email and password' });
     }
 
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+
     try {
-        const normalizedEmail = email.toLowerCase();
+        const normalizedEmail = trimmedEmail.toLowerCase();
         let user = await User.findOne({ email: normalizedEmail });
 
         if (!user) {
             console.warn(`[AUTH] Failed login attempt: User not found (${normalizedEmail})`);
-            return res.status(400).json({ msg: 'Invalid Credentials' });
+            return res.status(400).json({ msg: 'User not found' });
         }
 
         // Plain text password comparison as requested
-        if (password !== user.password) {
+        if (trimmedPassword !== user.password) {
             console.warn(`[AUTH] Failed login attempt: Incorrect password for ${normalizedEmail}`);
-            return res.status(400).json({ msg: 'Invalid Credentials' });
+            return res.status(400).json({ msg: 'Incorrect password' });
         }
 
         const payload = {
