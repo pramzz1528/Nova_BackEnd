@@ -1,9 +1,3 @@
-/**
- * NOVA Brain Models
- * -----------------
- * This file DEFINES behavior.
- * This is the REAL "brain".
- */
 
 module.exports = {
   CHAT: {

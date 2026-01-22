@@ -59,11 +59,8 @@ exports.login = async (req, res) => {
         return res.status(400).json({ msg: 'Please enter both email and password' });
     }
 
-    const trimmedEmail = email.trim();
-    const trimmedPassword = password.trim();
-
     try {
-        const normalizedEmail = trimmedEmail.toLowerCase();
+        const normalizedEmail = email.toLowerCase().trim();
         let user = await User.findOne({ email: normalizedEmail });
 
         if (!user) {
@@ -72,7 +69,7 @@ exports.login = async (req, res) => {
         }
 
         // Plain text password comparison as requested
-        if (trimmedPassword !== user.password) {
+        if (password.trim() !== user.password) {
             console.warn(`[AUTH] Failed login attempt: Incorrect password for ${normalizedEmail}`);
             return res.status(400).json({ msg: 'Incorrect password' });
         }
