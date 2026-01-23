@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+// Controller validation cannot be tested here since we are using Models directly.
+// We rely on manual verification or API tests for controller logic.
 const User = require('../models/User');
 const dotenv = require('dotenv');
 const fs = require('fs');

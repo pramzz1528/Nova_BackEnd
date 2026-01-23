@@ -6,7 +6,7 @@ Legacy user inserted (raw) with plain text password.
 Legacy Password (should be plain): LegacyPassword123!
 Legacy Match check: PASS
 Triggering Auto-Migration...
-Post-Login Password: $2b$10$rw01cMQHQLYM9wZ2chfntO8bzW6aBYrEUvBXDD3hVomMSQPwt6pta
+Post-Login Password: $2b$10$b3675stI52LBmlxTJgSaUu/YoQJaKYTJLkQOPq3JHkYQDFQ5ErhBu
 Migration Verification: PASS
 
 2. Standard Flow Verification...
