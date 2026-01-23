@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -11,7 +12,6 @@ const UserSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    // User explicitly asked for NO hashing
     password: {
         type: String,
         required: true
@@ -73,8 +73,29 @@ const UserSchema = new mongoose.Schema({
     }
 });
 
+// Encrypt password using bcrypt
+UserSchema.pre('save', async function () {
+    if (!this.isModified('password')) {
+        return;
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+});
+
+// Match user entered password to hashed password in database
+UserSchema.methods.matchPassword = async function (enteredPassword) {
+    // Check if password is hashed (bcrypt hashes start with $2a$ or $2b$)
+    if (this.password.startsWith('$2')) {
+        return await bcrypt.compare(enteredPassword, this.password);
+    } else {
+        // Fallback for legacy plain text passwords
+        return this.password === enteredPassword;
+    }
+};
+
 // Pre-save hook for email normalization
-UserSchema.pre('save', function () {
+UserSchema.pre('save', async function () {
     if (this.email) {
         this.email = this.email.toLowerCase();
     }

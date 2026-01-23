@@ -1,6 +1,22 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
+// Helper function for password validation
+const validatePassword = (password) => {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+
+    if (password.length < minLength) return 'Password must be at least 8 characters long';
+    if (!hasUpperCase) return 'Password must contain at least one uppercase letter';
+    if (!hasLowerCase) return 'Password must contain at least one lowercase letter';
+    if (!hasNumber) return 'Password must contain at least one number';
+    if (!hasSpecialChar) return 'Password must contain at least one special character';
+    return null;
+};
+
 // @route   POST api/auth/register
 // @desc    Register user
 // @access  Public
@@ -13,8 +29,9 @@ exports.register = async (req, res) => {
     }
 
     // Password validation
-    if (password.length < 6) {
-        return res.status(400).json({ msg: 'Password must be at least 6 characters long' });
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+        return res.status(400).json({ msg: passwordError });
     }
 
     try {
@@ -29,7 +46,7 @@ exports.register = async (req, res) => {
             return res.status(400).json({ msg: 'Username already taken' });
         }
 
-        // Create new user (password is stored as plain text per user request)
+        // Create new user (password will be hashed by pre-save hook)
         user = new User({
             username,
             email,
@@ -68,10 +85,25 @@ exports.login = async (req, res) => {
             return res.status(400).json({ msg: 'User not found' });
         }
 
-        // Plain text password comparison as requested
-        if (password.trim() !== user.password) {
+        // Check password using matchPassword method (handles both hashed and legacy plain text)
+        const isMatch = await user.matchPassword(password);
+        if (!isMatch) {
             console.warn(`[AUTH] Failed login attempt: Incorrect password for ${normalizedEmail}`);
             return res.status(400).json({ msg: 'Incorrect password' });
+        }
+
+        // Auto-Migration: If password was plain text (legacy), hash it now
+        if (!user.password.startsWith('$2')) {
+            console.log(`[AUTH] Migrating legacy password for user ${user.email}`);
+            user.password = password; // Set it again to trigger pre-save hook check? 
+            // Actually, we need to mark it as modified or just save it. 
+            // The pre-save hook checks isModified('password'). 
+            // If we set user.password = password (same value), mongoose might not mark it modified.
+            // Let's force mark modified just to be sure, OR verify how the hook works.
+            // But wait, the hook hashes it. user.password currently holds the plain text from DB.
+            // We just need to trigger the save.
+            user.markModified('password');
+            await user.save();
         }
 
         const payload = {
@@ -103,7 +135,7 @@ exports.onboarding = async (req, res) => {
     const { profession, assistantName, personality } = req.body;
 
     // Optional validation: check if profession is valid
-    const validProfessions = ['IT Professional', 'Student', 'HR / Manager', 'Freelancer', 'General User', 'Not Specified'];
+    const validProfessions = ['IT Professional'];
     if (profession && !validProfessions.includes(profession)) {
         return res.status(400).json({ msg: 'Invalid profession selection' });
     }
@@ -243,8 +275,10 @@ exports.changePassword = async (req, res) => {
         return res.status(400).json({ msg: 'Please provide both current and new passwords' });
     }
 
-    if (newPassword.length < 6) {
-        return res.status(400).json({ msg: 'New password must be at least 6 characters long' });
+    // Password validation
+    const passwordError = validatePassword(newPassword);
+    if (passwordError) {
+        return res.status(400).json({ msg: passwordError });
     }
 
     try {
@@ -254,10 +288,10 @@ exports.changePassword = async (req, res) => {
             return res.status(404).json({ msg: 'User not found' });
         }
 
-        // Plain text comparison as requested
-        if (user.password !== currentPassword) {
+        // Check if current password is correct
+        const isMatch = await user.matchPassword(currentPassword);
+        if (!isMatch) {
             console.log(`[AUTH] Incorrect current password for user ${user.email}`);
-            console.log(`[AUTH] Provided: ${currentPassword} | Stored: ${user.password}`);
             return res.status(400).json({ msg: 'Incorrect current password' });
         }
 

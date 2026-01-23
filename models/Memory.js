@@ -13,7 +13,7 @@ const MemorySchema = new mongoose.Schema({
     },
     content: {
         type: String,
-        required: true
+        required: true 
     },
     context: {
         type: mongoose.Schema.Types.Mixed // For storing additional metadata like skill involved
