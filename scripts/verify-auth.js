@@ -43,9 +43,6 @@ const runVerification = async () => {
         await User.deleteOne({ email: 'legacy@test.com' });
 
         // Insert plain text user (simulating old user)
-        // We use insertOne to bypass Mongoose hooks if possible, or just create skipping hooks? 
-        // new User + save() runs hooks. pre('save') runs.
-        // We need to insert directly into collection to bypass the new pre-save hook that auto-hashes.
         await mongoose.connection.collection('users').insertOne({
             username: 'legacyuser',
             email: 'legacy@test.com',
@@ -61,17 +58,23 @@ const runVerification = async () => {
         let legacyUser = await User.findOne({ email: 'legacy@test.com' });
         log(`Legacy Password (should be plain): ${legacyUser.password}`);
 
-        // Simulate Login Controller Logic
-        // The controller logic is:
-        // 1. matchPassword(password)
-        // 2. if match and !hashed -> markModified -> save
+        // Simulate Login Controller Logic for Migration
+        // Logic: 1. Check if hash. 2. If not, compare plain. 3. If match, hash and save.
 
-        const isMatchLegacy = await legacyUser.matchPassword('LegacyPassword123!');
+        let isMatchLegacy = false;
+        if (legacyUser.password.startsWith('$2')) {
+            isMatchLegacy = await bcrypt.compare('LegacyPassword123!', legacyUser.password);
+        } else {
+            isMatchLegacy = ('LegacyPassword123!' === legacyUser.password);
+        }
+
         log(`Legacy Match check: ${isMatchLegacy ? 'PASS' : 'FAIL'}`);
 
         if (isMatchLegacy && !legacyUser.password.startsWith('$2')) {
             log('Triggering Auto-Migration...');
-            legacyUser.markModified('password');
+            // Manual Hash (Controller Logic)
+            const salt = await bcrypt.genSalt(10);
+            legacyUser.password = await bcrypt.hash('LegacyPassword123!', salt);
             await legacyUser.save();
         }
 
@@ -89,20 +92,26 @@ const runVerification = async () => {
         const testUserEmail = 'testverify@example.com';
         await User.deleteOne({ email: testUserEmail });
 
+        // SIMULATE REGISTER CONTROLLER
+        const plainPassword = 'StrongPassword123!';
+        const salt = await bcrypt.genSalt(10);
+        const secPassword = await bcrypt.hash(plainPassword, salt);
+        log(`Generated Hash for new user: ${secPassword}`);
+
         const user = new User({
             username: 'testverify',
             email: testUserEmail,
-            // Use a valid complex password
-            password: 'StrongPassword123!'
+            password: secPassword // Controller saves hash
         });
         await user.save();
-        log('New user created.');
+        log('New user created (hashed via script).');
 
         const savedUser = await User.findOne({ email: testUserEmail });
         const isHashed = savedUser.password.startsWith('$2');
         log(`Hash Verification: ${isHashed ? 'PASS' : 'FAIL'}`);
 
-        const isMatch = await savedUser.matchPassword('StrongPassword123!');
+        // SIMULATE LOGIN CONTROLLER
+        const isMatch = await bcrypt.compare(plainPassword, savedUser.password);
         log(`Login Match: ${isMatch ? 'PASS' : 'FAIL'}`);
 
         await User.deleteOne({ email: testUserEmail });

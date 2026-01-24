@@ -73,19 +73,30 @@ const UserSchema = new mongoose.Schema({
     }
 });
 
-// Encrypt password using bcrypt
+// Pre-save hook for hashing password and email normalization
 UserSchema.pre('save', async function () {
+    // 1. Normalize email
+    if (this.isModified('email') && this.email) {
+        this.email = this.email.toLowerCase();
+    }
+
+    // 2. Hash password if modified
     if (!this.isModified('password')) {
         return;
     }
 
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
+    try {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+    } catch (err) {
+        throw err;
+    }
 });
 
 // Match user entered password to hashed password in database
 UserSchema.methods.matchPassword = async function (enteredPassword) {
     // Check if password is hashed (bcrypt hashes start with $2a$ or $2b$)
+    // Note: Since we auto-hash on save, this check is mostly for legacy support during migration
     if (this.password.startsWith('$2')) {
         return await bcrypt.compare(enteredPassword, this.password);
     } else {
@@ -93,12 +104,5 @@ UserSchema.methods.matchPassword = async function (enteredPassword) {
         return this.password === enteredPassword;
     }
 };
-
-// Pre-save hook for email normalization
-UserSchema.pre('save', async function () {
-    if (this.email) {
-        this.email = this.email.toLowerCase();
-    }
-});
 
 module.exports = mongoose.model('User', UserSchema);

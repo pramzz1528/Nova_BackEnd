@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 // Helper function for password validation
 const validatePassword = (password) => {
@@ -46,7 +47,7 @@ exports.register = async (req, res) => {
             return res.status(400).json({ msg: 'Username already taken' });
         }
 
-        // Create new user (password will be hashed by pre-save hook)
+        // Create new user (password hashing handled by pre-save hook)
         user = new User({
             username,
             email,
@@ -54,8 +55,6 @@ exports.register = async (req, res) => {
         });
 
         await user.save();
-
-        // payload/token generation removed to force manual login
 
         res.status(201).json({
             msg: 'User registered successfully. Please login.'
@@ -85,25 +84,20 @@ exports.login = async (req, res) => {
             return res.status(400).json({ msg: 'User not found' });
         }
 
-        // Check password using matchPassword method (handles both hashed and legacy plain text)
+        // Check password using model method
         const isMatch = await user.matchPassword(password);
+
         if (!isMatch) {
             console.warn(`[AUTH] Failed login attempt: Incorrect password for ${normalizedEmail}`);
             return res.status(400).json({ msg: 'Incorrect password' });
         }
 
-        // Auto-Migration: If password was plain text (legacy), hash it now
+        // Auto-Migration: If verifying a legacy plain text password, re-save to trigger hashing
+        // matchPassword returns true for legacy plain text too.
         if (!user.password.startsWith('$2')) {
             console.log(`[AUTH] Migrating legacy password for user ${user.email}`);
-            user.password = password; // Set it again to trigger pre-save hook check? 
-            // Actually, we need to mark it as modified or just save it. 
-            // The pre-save hook checks isModified('password'). 
-            // If we set user.password = password (same value), mongoose might not mark it modified.
-            // Let's force mark modified just to be sure, OR verify how the hook works.
-            // But wait, the hook hashes it. user.password currently holds the plain text from DB.
-            // We just need to trigger the save.
-            user.markModified('password');
-            await user.save();
+            user.password = password; // Trigger modification
+            await user.save(); // Pre-save hook will hash it
         }
 
         const payload = {
@@ -290,13 +284,16 @@ exports.changePassword = async (req, res) => {
 
         // Check if current password is correct
         const isMatch = await user.matchPassword(currentPassword);
+
         if (!isMatch) {
             console.log(`[AUTH] Incorrect current password for user ${user.email}`);
             return res.status(400).json({ msg: 'Incorrect current password' });
         }
 
+        // Update password (hashing handled by pre-save hook)
         user.password = newPassword;
         await user.save();
+
         console.log(`[AUTH] Password updated successfully for user ${user.email}`);
 
         res.json({ msg: 'Password updated successfully' });

@@ -1,0 +1,99 @@
+﻿[dotenv@17.2.3] injecting env (4) from .env -- tip: ≡ƒöÉ encrypt with Dotenvx: https://dotenvx.com
+Connecting to MongoDB...
+Connected.
+Creating new user...
+Calling user.save()...
+[User Model] pre-save hook triggered
+[User Model] Hashing password...
+[User Model] Password hashed successfully
+node : [User Model] 
+Hashing error: 
+TypeError: next is 
+not a function
+At line:1 char:1
++ node verify_hashing
+_impl.js 2>&1 | 
+Out-File -Encoding 
+utf8 output_err ...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: ([User M   
+ odel] Ha... not     
+a function:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+    at 
+model.<anonymous> (C:
+\Users\Pramod.K\Deskt
+op\Foxiom 
+Project\nova backend\
+models\User.js:95:9)
+    at async 
+Kareem.execPre (C:\Us
+ers\Pramod.K\Desktop\
+Foxiom Project\nova b
+ackend\node_modules\k
+areem\index.js:65:24)
+    at async 
+model.$__save (C:\Use
+rs\Pramod.K\Desktop\F
+oxiom Project\nova ba
+ckend\node_modules\mo
+ngoose\lib\model.js:3
+69:5)
+    at async 
+model.save (C:\Users\
+Pramod.K\Desktop\Foxi
+om Project\nova backe
+nd\node_modules\mongo
+ose\lib\model.js:609:
+5)
+    at async 
+runVerification (C:\U
+sers\Pramod.K\Desktop
+\Foxiom Project\nova 
+backend\verify_hashin
+g_impl.js:26:9)
+VERIFICATION FAILED:
+TypeError: next is 
+not a function
+    at 
+model.<anonymous> (C:
+\Users\Pramod.K\Deskt
+op\Foxiom 
+Project\nova backend\
+models\User.js:98:9)
+    at async 
+Kareem.execPre (C:\Us
+ers\Pramod.K\Desktop\
+Foxiom Project\nova b
+ackend\node_modules\k
+areem\index.js:65:24)
+    at async 
+model.$__save (C:\Use
+rs\Pramod.K\Desktop\F
+oxiom Project\nova ba
+ckend\node_modules\mo
+ngoose\lib\model.js:3
+69:5)
+    at async 
+model.save (C:\Users\
+Pramod.K\Desktop\Foxi
+om Project\nova backe
+nd\node_modules\mongo
+ose\lib\model.js:609:
+5)
+    at async 
+runVerification (C:\U
+sers\Pramod.K\Desktop
+\Foxiom Project\nova 
+backend\verify_hashin
+g_impl.js:26:9)
+Cleaning up...
+Disconnecting...

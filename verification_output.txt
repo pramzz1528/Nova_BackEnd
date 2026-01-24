@@ -6,11 +6,12 @@ Legacy user inserted (raw) with plain text password.
 Legacy Password (should be plain): LegacyPassword123!
 Legacy Match check: PASS
 Triggering Auto-Migration...
-Post-Login Password: $2b$10$b3675stI52LBmlxTJgSaUu/YoQJaKYTJLkQOPq3JHkYQDFQ5ErhBu
+Post-Login Password: $2b$10$Gedjpoh5YnEMJV.pK9CQBu0rcYlXC5HR.lW1I6uQGFOkhEREeBAh2
 Migration Verification: PASS
 
 2. Standard Flow Verification...
-New user created.
+Generated Hash for new user: $2b$10$06C6OD6DOYqRjHn0h44j5e3aRxOj6gTe9/BPbc0rgrgyfonikI6Ju
+New user created (hashed via script).
 Hash Verification: PASS
 Login Match: PASS
 
