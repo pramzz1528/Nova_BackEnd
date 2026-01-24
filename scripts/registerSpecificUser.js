@@ -2,7 +2,7 @@ const axios = require('axios');
 
 async function registerTestUser() {
     try {
-        const res = await axios.post('http://localhost:5001/api/auth/register', {
+        const res = await axios.post('https://nova-14cf3.web.appapi/auth/register', {
             username: 'testuser',
             email: 'test@example.com',
             password: 'Testpass@123'
