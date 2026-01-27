@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const API_URL = 'https://nova-14cf3.web.appapi';
+const API_URL = ' https://nova-frontend-new.web.app//api';
 
 async function testFeatures() {
     try {

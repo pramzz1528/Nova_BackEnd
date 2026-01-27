@@ -35,9 +35,9 @@ function postRequest(email, password, expectedError, testName) {
 // 1. Valid user, Wrong password
 setTimeout(() => {
     postRequest('api_test@example.com', 'WRONG_PASSWORD_123', 'Incorrect password', 'TestWrongPass');
-}, 3000);
+}, 9000);
 
 // 2. Non-existent user
 setTimeout(() => {
     postRequest('fails@example.com', 'anypass', 'User not found', 'TestNoUser');
-}, 3000);
+}, 9000);

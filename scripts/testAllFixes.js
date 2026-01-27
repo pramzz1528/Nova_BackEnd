@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const BACKEND_URL = 'https://nova-14cf3.web.appapi';
+const BACKEND_URL = ' https://nova-frontend-new.web.app//api';
 
 async function testAll() {
     console.log('--- STARTING VERIFICATION ---');

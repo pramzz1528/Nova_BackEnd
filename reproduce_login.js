@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const API_URL = 'https://nova-14cf3.web.appapi/auth';
+const API_URL = 'https://nova-frontend-new.web.app/api/auth';
 
 async function testLogin() {
     const testUser = {
