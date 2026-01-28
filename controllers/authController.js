@@ -61,7 +61,7 @@ exports.register = async (req, res) => {
         });
     } catch (err) {
         console.error('Registration Error:', err.message);
-        res.status(500).json({ msg: 'Server error during registration', error: err.message });
+        res.status(500).json({ msg: 'Server error during registration' });
     }
 };
 
@@ -118,7 +118,7 @@ exports.login = async (req, res) => {
         });
     } catch (err) {
         console.error('Login Error:', err.message);
-        res.status(500).json({ msg: 'Server error during login', error: err.message });
+        res.status(500).json({ msg: 'Server error during login' });
     }
 };
 
@@ -160,7 +160,7 @@ exports.onboarding = async (req, res) => {
         res.json(user);
     } catch (err) {
         console.error('Onboarding Error:', err.message);
-        res.status(500).json({ msg: 'Server error during onboarding', error: err.message });
+        res.status(500).json({ msg: 'Server error during onboarding' });
     }
 };
 
@@ -253,7 +253,7 @@ exports.updateProfile = async (req, res) => {
         });
     } catch (err) {
         console.error('Update Profile Error:', err.message);
-        res.status(500).json({ msg: 'Server error during profile update', error: err.message });
+        res.status(500).json({ msg: 'Server error during profile update' });
     }
 };
 
@@ -299,6 +299,6 @@ exports.changePassword = async (req, res) => {
         res.json({ msg: 'Password updated successfully' });
     } catch (err) {
         console.error('Change Password Error:', err.message);
-        res.status(500).json({ msg: 'Server error during password change', error: err.message });
+        res.status(500).json({ msg: 'Server error during password change' });
     }
 };
