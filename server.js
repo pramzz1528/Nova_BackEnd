@@ -23,12 +23,17 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // Health Check
 app.get("/health", (req, res) => res.json({ status: "NOVA Backend is healthy", timestamp: new Date() }));
 
+const taskRoutes = require("./routes/taskRoutes");
+const reminderRoutes = require("./routes/reminderRoutes");
+
 app.use("/api/ai", aiRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/automation", automationRoutes);
 app.use("/api/skills", skillRoutes);
 app.use("/api/code-review", smartCodeReviewRoutes);
 app.use("/api/project-planner", aiProjectPlannerRoutes);
+app.use("/api/tasks", taskRoutes);
+app.use("/api/reminders", reminderRoutes);
 
 const PORT = process.env.PORT || 5001;
 
